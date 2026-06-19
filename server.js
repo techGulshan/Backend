@@ -38,6 +38,64 @@ app.get("/api/color", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+app.post("/api/color", async (req, res) => {
+  try {
+    const { color } = req.body;
+
+    const newColor = await Color.create({
+      color: color || generateRandomColor()
+    });
+
+    res.status(201).json(newColor);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.put("/api/color/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { color } = req.body;
+
+    const updatedColor = await Color.findByIdAndUpdate(
+      id,
+      { color },
+      { new: true } // returns updated document
+    );
+
+    if (!updatedColor) {
+      return res.status(404).json({ message: "Color not found" });
+    }
+
+    res.json({
+      message: "Color updated successfully",
+      updatedColor
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.delete("/api/color/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deletedColor = await Color.findByIdAndDelete(id);
+
+    if (!deletedColor) {
+      return res.status(404).json({ message: "Color not found" });
+    }
+
+    res.json({
+      message: "Color deleted successfully",
+      deletedColor
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 // Get all generated colors
 app.get("/api/colors", async (req, res) => {
